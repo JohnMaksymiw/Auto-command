@@ -24,22 +24,22 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 BOARDS = [
     {
         "label":  "Mixer",
-        "src":    "Mixer_code.cpp",
-        "sketch": "Mixer_code",
+        "src":    "Mixer_13301.ino",
+        "sketch": "Mixer_13301",
         "serial": "13301",
         "fqbn":   "arduino:avr:uno",
     },
     {
         "label":  "Bowl",
-        "src":    "Bowl_code.cpp",
-        "sketch": "Bowl_code",
+        "src":    "3_Bowl.ino",
+        "sketch": "3_Bowl",
         "serial": "11101",
         "fqbn":   "arduino:avr:uno",
     },
     {
         "label":  "Linear",
-        "src":    "linear.cpp",
-        "sketch": "linear",
+        "src":    "2_Dispenser.ino",
+        "sketch": "2_Dispenser",
         "serial": "13401",
         "fqbn":   "arduino:avr:uno",
     },
