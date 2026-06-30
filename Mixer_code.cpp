@@ -206,6 +206,7 @@ void waitForLinear(unsigned long timeoutMs = 120000);
 
 void relayStart();
 void relayEnd();
+void mixCycle();
 
 void loadCalibrationFromEEPROM();
 void saveCalibrationToEEPROM();
@@ -270,6 +271,61 @@ void relayEnd() {
   resetRotationCapture();
 
   Serial.println(F("Mixer relay END"));
+}
+
+// ================= Mix Cycle sequence =================
+void mixCycle() {
+  const int highestWiper = WIPER_POSITIONS[NUM_SERIES - 1]; // 85
+
+  Serial.println(F("mixcycle: Step 1 - Bowl to mix position..."));
+  sendToBowl("moveto=8950");
+  waitForBowl();
+
+  Serial.println(F("mixcycle: Step 2 - Mixer to mix position..."));
+  moveToHeightPreset(MIX_HEIGHT_POS, "MIX");
+
+  Serial.println(F("mixcycle: Step 3 - Bowl rotate on..."));
+  sendToBowl("on");
+
+  Serial.println(F("mixcycle: Step 4 - Mixer Extraction Servo open..."));
+  sendToLinear("o");
+
+  Serial.println(F("mixcycle: Step 5 - Relay on, wiper to max..."));
+  setWiper(highestWiper);
+  digitalWrite(relayPin, RELAY_ON);
+  relayState = true;
+
+  Serial.println(F("mixcycle: Step 6 - Running 30s..."));
+  waitWithLoadCellUpdates(30000);
+
+  Serial.println(F("mixcycle: Step 7 - Relay off..."));
+  digitalWrite(relayPin, RELAY_OFF);
+  relayState = false;
+
+  Serial.println(F("mixcycle: Step 8 - Bowl rotate off..."));
+  sendToBowl("off");
+
+  Serial.println(F("mixcycle: Step 9 - Mixer raise to 7000..."));
+  moveToHeightPreset(7000, "PARTIAL_RAISE");
+
+  Serial.println(F("mixcycle: Step 10 - Wait 30s..."));
+  waitWithLoadCellUpdates(30000);
+
+  Serial.println(F("mixcycle: Step 11 - Mixer return to mix position..."));
+  moveToHeightPreset(MIX_HEIGHT_POS, "MIX");
+
+  Serial.println(F("mixcycle: Step 12 - Relay on, wiper to max..."));
+  setWiper(highestWiper);
+  digitalWrite(relayPin, RELAY_ON);
+  relayState = true;
+
+  Serial.println(F("mixcycle: Step 13 - Bowl rotate on..."));
+  sendToBowl("on");
+
+  Serial.println(F("mixcycle: Step 14 - Running 2 minutes..."));
+  waitWithLoadCellUpdates(120000);
+
+  Serial.println(F("mixcycle: complete."));
 }
 
 // ================= Stepper power relay functions (NEW) =================
@@ -582,6 +638,9 @@ void processCommand(const char* cmd) {
   }
   else if (strcmp(cmd, "mix") == 0) {
     moveToHeightPreset(MIX_HEIGHT_POS, "MIX");
+  }
+  else if (strcmp(cmd, "mixcycle") == 0) {
+    mixCycle();
   }
   else if (strcmp(cmd, "raise") == 0) {
     moveToHeightPreset(RAISE_HEIGHT_POS, "RAISE");
