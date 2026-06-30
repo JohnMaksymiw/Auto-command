@@ -277,6 +277,11 @@ void relayEnd() {
 void mixCycle() {
   const int highestWiper = WIPER_POSITIONS[NUM_SERIES - 1]; // 85
 
+  // Ensure relay is off and analysis state is clean before starting
+  digitalWrite(relayPin, RELAY_OFF);
+  relayState = false;
+  resetRotationCapture();
+
   Serial.println(F("mixcycle: Step 1 - Bowl to mix position..."));
   sendToBowl("moveto=8950");
   waitForBowl();
