@@ -663,19 +663,19 @@ async function tryAutoConnect() {
     const info = saved[board.id];
     let port = null;
 
-    // Try to match by VID/PID first (works when boards have distinct chip types)
-    if (info && info.usbVendorId !== undefined) {
+    // Use saved index first — most reliable when all boards share the same VID/PID
+    if (info && info.index !== undefined && info.index < ports.length) {
+      const candidate = ports[info.index];
+      if (!claimed.has(candidate)) port = candidate;
+    }
+
+    // Fall back to VID/PID match only if no saved index (works when boards have distinct chip types)
+    if (!port && info && info.usbVendorId !== undefined) {
       port = ports.find(p => {
         if (claimed.has(p)) return false;
         const pi = p.getInfo();
         return pi.usbVendorId === info.usbVendorId && pi.usbProductId === info.usbProductId;
       });
-    }
-
-    // Fall back to stored index (reliable when all boards share the same VID/PID)
-    if (!port && info && info.index !== undefined && info.index < ports.length) {
-      const candidate = ports[info.index];
-      if (!claimed.has(candidate)) port = candidate;
     }
 
     // Last resort: next unclaimed port in order
