@@ -688,16 +688,16 @@ void processCommand(const char* cmd) {
     sendToLinear("moveto=27200");
     waitWithLoadCellUpdates(65000);
 
-    Serial.println(F("dispense: Step 5 - Bowl axis to 3850..."));
-    sendToBowl("moveto=3850");
+    Serial.println(F("dispense: Step 5 - Bowl axis to 3700..."));
+    sendToBowl("moveto=3700");
     waitForBowl();
 
-    Serial.println(F("dispense: Step 6 - Main axis to 1450..."));
-    sendToBowl("mainmoveto=1450");
+    Serial.println(F("dispense: Step 6 - Main axis to 1600..."));
+    sendToBowl("mainmoveto=1600");
     waitForBowl();
 
-    Serial.println(F("dispense: Step 7 - Bowl axis to -400..."));
-    sendToBowl("moveto=-400");
+    Serial.println(F("dispense: Step 7 - Bowl axis to -500..."));
+    sendToBowl("moveto=-500");
     waitForBowl();
 
     Serial.println(F("dispense: Step 8 - Main axis to 4450..."));
@@ -718,12 +718,12 @@ void processCommand(const char* cmd) {
     sendToBowl("mainmoveto=4450");
     waitForBowl();
 
-    Serial.println(F("returnafterdispense: Step 2 - Main axis to 1450..."));
-    sendToBowl("mainmoveto=1450");
+    Serial.println(F("returnafterdispense: Step 2 - Main axis to 1600..."));
+    sendToBowl("mainmoveto=1600");
     waitForBowl();
 
-    Serial.println(F("returnafterdispense: Step 3 - Bowl axis to 3850..."));
-    sendToBowl("moveto=3850");
+    Serial.println(F("returnafterdispense: Step 3 - Bowl axis to 3700..."));
+    sendToBowl("moveto=3700");
     waitForBowl();
 
     Serial.println(F("returnafterdispense: Step 4 - Main axis to 0..."));
