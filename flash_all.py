@@ -18,30 +18,36 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.request
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+GITHUB_RAW = "https://raw.githubusercontent.com/JohnMaksymiw/Auto-command/main"
+
 BOARDS = [
     {
-        "label":  "Mixer",
-        "src":    "Mixer_13301.ino",
-        "sketch": "Mixer_13301",
-        "serial": "13301",
-        "fqbn":   "arduino:avr:uno",
+        "label":   "Mixer",
+        "src":     "Mixer_code.cpp",
+        "sketch":  "Mixer_13301",
+        "serial":  "13301",
+        "fqbn":    "arduino:avr:uno",
+        "github":  f"{GITHUB_RAW}/Mixer_code.cpp",
     },
     {
-        "label":  "Bowl",
-        "src":    "3_Bowl.ino",
-        "sketch": "3_Bowl",
-        "serial": "11101",
-        "fqbn":   "arduino:avr:uno",
+        "label":   "Bowl",
+        "src":     "Bowl_code.cpp",
+        "sketch":  "3_Bowl",
+        "serial":  "11101",
+        "fqbn":    "arduino:avr:uno",
+        "github":  f"{GITHUB_RAW}/Bowl_code.cpp",
     },
     {
-        "label":  "Linear",
-        "src":    "2_Dispenser.ino",
-        "sketch": "2_Dispenser",
-        "serial": "13401",
-        "fqbn":   "arduino:avr:uno",
+        "label":   "Linear",
+        "src":     "linear.cpp",
+        "sketch":  "2_Dispenser",
+        "serial":  "13401",
+        "fqbn":    "arduino:avr:uno",
+        "github":  f"{GITHUB_RAW}/linear.cpp",
     },
 ]
 
@@ -106,12 +112,28 @@ def match_port(ports, serial_suffix):
     return None
 
 
-def flash_board(board, port, tmpdir):
+def fetch_source(board, tmpdir):
     sketch_dir = os.path.join(tmpdir, board["sketch"])
     os.makedirs(sketch_dir)
-    src = os.path.join(SCRIPT_DIR, board["src"])
     dst = os.path.join(sketch_dir, board["sketch"] + ".ino")
-    shutil.copy2(src, dst)
+    print(f"  Downloading latest {board['src']} from GitHub...")
+    try:
+        urllib.request.urlretrieve(board["github"] + f"?v={os.getpid()}", dst)
+        print(f"  Downloaded OK")
+    except Exception as e:
+        print(f"  WARNING: GitHub download failed ({e}), falling back to local file.")
+        local = os.path.join(SCRIPT_DIR, board["src"])
+        if os.path.exists(local):
+            shutil.copy2(local, dst)
+        else:
+            print(f"  ERROR: No local fallback found for {board['src']}")
+            return None
+    return sketch_dir
+
+def flash_board(board, port, tmpdir):
+    sketch_dir = fetch_source(board, tmpdir)
+    if not sketch_dir:
+        return False
 
     print(f"\n{'='*50}")
     print(f"  {board['label']} — compiling {board['src']}")
