@@ -93,7 +93,7 @@ const long HOME_MAX_STEPS = 50000;
 
 // EDIT THESE POSITIONS AFTER HOMING / JOGGING
 const long MIX_HEIGHT_POS   = 1000;
-const long RAISE_HEIGHT_POS = 20000;
+const long RAISE_HEIGHT_POS = 21000;
 
 // ================= Position / command state =================
 long mixerPosSteps = 0;
