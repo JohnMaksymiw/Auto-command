@@ -70,34 +70,26 @@ def find_ports():
         print(result.stdout)
         sys.exit(1)
 
-    # Handle both old (list) and new (dict with detected_ports) formats
-    if isinstance(data, dict):
-        entries = data.get("detected_ports", data.get("ports", []))
-    else:
-        entries = data
+    # Support both list and {"detected_ports": [...]} formats
+    entries = data.get("detected_ports", []) if isinstance(data, dict) else data
 
-    ports = {}
+    ports = []
     for entry in entries:
         if not isinstance(entry, dict):
             continue
-        port_info = entry.get("port", entry)
-        address   = port_info.get("address", "")
-        props     = port_info.get("properties", {})
-        hw_id     = port_info.get("hardware_id", "")
-        serial    = props.get("serialNumber", hw_id)
-        if address and serial:
-            ports[serial] = address
-
-    if not ports:
-        print("Raw board list output for debugging:")
-        print(result.stdout)
+        port_info = entry.get("port", {})
+        address = port_info.get("address", "")
+        if address:
+            ports.append(address)
 
     return ports
 
 
 def match_port(ports, serial_suffix):
-    for sn, addr in ports.items():
-        if sn.endswith(serial_suffix) or sn == serial_suffix:
+    # Match by port address ending with the serial number
+    # e.g. serial "13301" matches "/dev/cu.usbmodem13301"
+    for addr in ports:
+        if addr.endswith(serial_suffix):
             return addr
     return None
 
@@ -142,8 +134,8 @@ def main():
         sys.exit(1)
 
     print(f"Found {len(ports)} port(s):")
-    for sn, addr in ports.items():
-        print(f"  {addr}  (serial: {sn})")
+    for addr in ports:
+        print(f"  {addr}")
 
     tmpdir = tempfile.mkdtemp(prefix="arduino_flash_")
     failures = []
