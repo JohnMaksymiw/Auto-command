@@ -19,7 +19,7 @@
 //   STEP=A0, DIR=13, Auger relay=9
 //   HX711: dout=5, sck=4
 //   Gate servo=12        (open/close/auto)
-//   Manifold Servo A=6   (o/c)
+//   Mixer Extraction Servo=6   (o/c)
 //   Manifold Servo B=A3  (o2/c2)
 //   Vacuum relay=10      (vacuumon/vacuumoff / auto during dispensing)
 //
@@ -300,7 +300,7 @@ void applyServoARelay() {
   if (on != servoARelayState) {
     servoARelayState = on;
     digitalWrite(SERVO_A_RELAY_PIN, on ? HIGH : LOW);
-    Serial.println(on ? F("Servo A relay ON") : F("Servo A relay OFF"));
+    Serial.println(on ? F("Mixer Extraction Servo relay ON") : F("Mixer Extraction Servo relay OFF"));
   }
 }
 
@@ -628,13 +628,13 @@ void processCommand(const char* cmd) {
   else if (strcmp(cmd, "o") == 0) {
     manifoldServoA.write(MANIFOLD_SERVO_A_OPEN_ANGLE);
     triggerServoARelay();
-    Serial.println(F("Manifold Servo A -> OPEN"));
+    Serial.println(F("Mixer Extraction Servo -> OPEN"));
     linearBusy = false;
   }
   else if (strcmp(cmd, "c") == 0) {
     manifoldServoA.write(MANIFOLD_SERVO_A_CLOSED_ANGLE);
     triggerServoARelay();
-    Serial.println(F("Manifold Servo A -> CLOSED"));
+    Serial.println(F("Mixer Extraction Servo -> CLOSED"));
     linearBusy = false;
   }
   else if (strcmp(cmd, "o2") == 0) {
