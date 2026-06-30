@@ -707,10 +707,6 @@ void processCommand(const char* cmd) {
     Serial.println(F("dispense: Holding for 10 seconds..."));
     waitWithLoadCellUpdates(10000);
 
-    Serial.println(F("dispense: Step 9 - Main axis to 3200..."));
-    sendToBowl("mainmoveto=3200");
-    waitForBowl();
-
     Serial.println(F("dispense: complete."));
   }
   else if (strcmp(cmd, "returnafterdispense") == 0) {
