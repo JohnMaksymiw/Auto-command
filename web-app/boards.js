@@ -25,7 +25,7 @@ window.BOARDS = [
           { cmd: 'addmortar',           label: 'Add Mortar' },
           { cmd: 'finish',       label: 'Finish' },
           { cmd: 'refillcement', label: 'Refill Cement' },
-          { cmd: 'mixcycle', label: 'Mix', accent: true },
+          { cmd: 'mixcycle', label: 'Mix' },
           { cmd: 'start',    label: 'Start Test' },
           { cmd: 'end',      label: 'End Test' },
           { cmd: 'stop',     label: 'STOP', danger: true }
