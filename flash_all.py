@@ -46,12 +46,24 @@ BOARDS = [
 ]
 
 
+REQUIRED_LIBS = ["Servo", "HX711_ADC"]
+
 def check_arduino_cli():
     if shutil.which("arduino-cli") is None:
         print("ERROR: arduino-cli not found.")
         print("  Install: brew install arduino-cli")
         print("  Then:    arduino-cli core install arduino:avr")
         sys.exit(1)
+
+def install_libraries():
+    for lib in REQUIRED_LIBS:
+        print(f"Checking library: {lib}")
+        r = subprocess.run(
+            ["arduino-cli", "lib", "install", lib],
+            capture_output=True, text=True
+        )
+        if r.returncode != 0 and "already installed" not in r.stderr.lower():
+            print(f"  WARNING: could not install {lib}: {r.stderr.strip()}")
 
 
 def find_ports():
@@ -125,6 +137,7 @@ def flash_board(board, port, tmpdir):
 
 def main():
     check_arduino_cli()
+    install_libraries()
 
     print("Scanning for connected boards...")
     ports = find_ports()
