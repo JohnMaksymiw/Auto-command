@@ -327,7 +327,12 @@ void mixCycle() {
   Serial.println(F("mixcycle: Step 14 - Running 2 minutes..."));
   waitWithLoadCellUpdates(120000);
 
-  Serial.println(F("mixcycle: Step 15 - Vacuum off, Mixer Extraction Servo close, Dispenser Servo open..."));
+  Serial.println(F("mixcycle: Step 15 - Relay off, Bowl rotate off..."));
+  digitalWrite(relayPin, RELAY_OFF);
+  relayState = false;
+  sendToBowl("off");
+
+  Serial.println(F("mixcycle: Step 16 - Vacuum off, Mixer Extraction Servo close, Dispenser Servo open..."));
   sendToLinear("vacuumoff");
   sendToLinear("c");
   sendToLinear("o2");
