@@ -75,7 +75,6 @@ window.BOARDS = [
           { cmd: 'home',     label: 'Home' },
           { cmd: 'mix',      label: 'Move to Mix Position' },
           { cmd: 'dispense', label: 'Dispense' },
-          { cmd: 'stop',     label: 'STOP', danger: true }
         ]
       },
       {
@@ -121,7 +120,6 @@ window.BOARDS = [
           { cmd: 'mix',          label: 'Move to Mix Position' },
           { cmd: 'start',        label: 'Start Dispensing' },
           { cmd: 'stopdispense', label: 'Stop Dispensing' },
-          { cmd: 'stop',         label: 'STOP', danger: true }
         ]
       },
       {
