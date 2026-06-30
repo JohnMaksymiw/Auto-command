@@ -14,21 +14,30 @@ window.BOARDS = [
         ]
       },
       {
-        title: 'Commands',
+        title: 'Home',
         commands: [
-          { cmd: 'homeall',  label: 'Home All' },
-          { cmd: 'home',     label: 'Home Mixer' },
-          { cmd: 'mix',      label: 'Move to Mix Position' },
-          { cmd: 'raise',      label: 'Move to the Top' },
-          { cmd: 'dispense',            label: 'Dispense' },
+          { cmd: 'homeall', label: 'Home All' },
+          { cmd: 'home',    label: 'Home Mixer' }
+        ]
+      },
+      {
+        title: 'Movement',
+        commands: [
+          { cmd: 'mix',               label: 'Move to Mix Position' },
+          { cmd: 'raise',             label: 'Move to Raise Position' },
+          { cmd: 'refillcement',      label: 'Refill Cement' },
+          { cmd: 'mixcycle',          label: 'Mix' },
+          { cmd: 'dispense',          label: 'Dispense' },
+          { cmd: 'addmortar',         label: 'Add Mortar' },
           { cmd: 'returnafterdispense', label: 'Return After Dispense' },
-          { cmd: 'addmortar',           label: 'Add Mortar' },
-          { cmd: 'finish',       label: 'Finish' },
-          { cmd: 'refillcement', label: 'Refill Cement' },
-          { cmd: 'mixcycle', label: 'Mix' },
-          { cmd: 'start',    label: 'Start Test' },
-          { cmd: 'end',      label: 'End Test' },
-          { cmd: 'stop',     label: 'STOP', danger: true }
+          { cmd: 'finish',            label: 'Finish' }
+        ]
+      },
+      {
+        title: 'Analysis',
+        commands: [
+          { cmd: 'start', label: 'Start Bingham Analysis' },
+          { cmd: 'end',   label: 'End Bingham Analysis' }
         ]
       },
       {
