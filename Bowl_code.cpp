@@ -177,8 +177,9 @@ const long ANGLE_HOME_EXTRA_B_TURNS = 15;   // Y extra turns in b direction
 const long ANGLE_HOME_F_STEPS = ANGLE_HOME_F_TURNS * STEPS_PER_REV;
 const long ANGLE_HOME_B_STEPS = (ANGLE_HOME_F_TURNS + ANGLE_HOME_EXTRA_B_TURNS) * STEPS_PER_REV;
 
-const uint16_t PULSE_US    = 5;         // step pulse width
-const uint16_t INTERVAL_US = 1000;      // time between steps; lower = faster
+const uint16_t PULSE_US         = 5;     // step pulse width
+const uint16_t INTERVAL_US      = 1000;  // time between steps during normal moves; lower = faster
+const uint16_t HOME_INTERVAL_US = 500;   // faster interval during homing to avoid resonant frequency
 
 const bool invertB      = true;         // flip Motor B direction if mechanics are mirrored
 const bool invertBowl   = false;        // flip bowl direction if it's backwards
@@ -462,6 +463,31 @@ void stepBowlOnce(bool forwards) {
   bowlPosSteps += forwards ? 1 : -1;
 }
 
+void stepBothOnceHoming(bool forwards) {
+  digitalWrite(dirA, forwards ? HIGH : LOW);
+  digitalWrite(dirB, (forwards ^ invertB) ? HIGH : LOW);
+
+  digitalWrite(stepA, HIGH);
+  digitalWrite(stepB, HIGH);
+  delayMicroseconds(PULSE_US);
+  digitalWrite(stepA, LOW);
+  digitalWrite(stepB, LOW);
+  delayMicroseconds(HOME_INTERVAL_US);
+
+  mainPosSteps += forwards ? 1 : -1;
+}
+
+void stepBowlOnceHoming(bool forwards) {
+  digitalWrite(dirBowl, (forwards ^ invertBowl) ? HIGH : LOW);
+
+  digitalWrite(stepBowl, HIGH);
+  delayMicroseconds(PULSE_US);
+  digitalWrite(stepBowl, LOW);
+  delayMicroseconds(HOME_INTERVAL_US);
+
+  bowlPosSteps += forwards ? 1 : -1;
+}
+
 void moveBoth(bool forwards, long steps) {
   for (long i = 0; i < steps; i++) {
     stepBothOnce(forwards);
@@ -552,7 +578,7 @@ void homeAxes() {
     // bowl moves first until homed
     if (!bowlHomed) {
       bowlMotorPowerOn();
-      stepBowlOnce(HOME_BOWL_FORWARDS);
+      stepBowlOnceHoming(HOME_BOWL_FORWARDS);
       bowlHomingStepCount++;
     }
 
@@ -560,7 +586,7 @@ void homeAxes() {
     if (!angleHomed && mainUnlocked) {
       if (!mainPreMoveDone) {
         if (mainPosSteps > -500) {
-          stepBothOnce(false);   // move toward -500
+          stepBothOnceHoming(false);   // move toward -500
         } else {
           mainPreMoveDone = true;
           Serial.println(F("Main axis at -500, starting angle search"));
@@ -569,7 +595,7 @@ void homeAxes() {
       else {
         if (angleSearchPhase == 0) {
           if (angleStepsDone < ANGLE_HOME_F_STEPS) {
-            stepBothOnce(true);   // f direction
+            stepBothOnceHoming(true);   // f direction
             angleStepsDone++;
           } else {
             angleSearchPhase = 1;
@@ -579,7 +605,7 @@ void homeAxes() {
         }
         else if (angleSearchPhase == 1) {
           if (angleStepsDone < ANGLE_HOME_B_STEPS) {
-            stepBothOnce(false);  // b direction
+            stepBothOnceHoming(false);  // b direction
             angleStepsDone++;
           } else {
             bowlMotorPowerOff();
