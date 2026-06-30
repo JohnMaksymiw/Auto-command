@@ -70,15 +70,27 @@ def find_ports():
         print(result.stdout)
         sys.exit(1)
 
+    # Handle both old (list) and new (dict with detected_ports) formats
+    if isinstance(data, dict):
+        entries = data.get("detected_ports", data.get("ports", []))
+    else:
+        entries = data
+
     ports = {}
-    for entry in data:
-        port_info = entry.get("port", {})
-        address = port_info.get("address", "")
-        props = port_info.get("properties", {})
-        hw_id = port_info.get("hardware_id", "")
-        serial = props.get("serialNumber", hw_id)
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        port_info = entry.get("port", entry)
+        address   = port_info.get("address", "")
+        props     = port_info.get("properties", {})
+        hw_id     = port_info.get("hardware_id", "")
+        serial    = props.get("serialNumber", hw_id)
         if address and serial:
             ports[serial] = address
+
+    if not ports:
+        print("Raw board list output for debugging:")
+        print(result.stdout)
 
     return ports
 
