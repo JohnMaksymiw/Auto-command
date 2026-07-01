@@ -696,8 +696,8 @@ void processCommand(const char* cmd) {
     sendToBowl("mainmoveto=1650");
     waitForBowl();
 
-    Serial.println(F("dispense: Step 7 - Bowl axis to -500..."));
-    sendToBowl("moveto=-500");
+    Serial.println(F("dispense: Step 7 - Bowl axis to -450..."));
+    sendToBowl("moveto=-450");
     waitForBowl();
 
     Serial.println(F("dispense: Step 8 - Main axis to 4450..."));
