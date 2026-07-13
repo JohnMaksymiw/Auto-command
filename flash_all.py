@@ -49,6 +49,14 @@ BOARDS = [
         "fqbn":    "arduino:avr:uno",
         "github":  f"{GITHUB_RAW}/linear.cpp",
     },
+    {
+        "label":   "Linear2",
+        "src":     "linear2.cpp",
+        "sketch":  "Linear2_132201",
+        "serial":  "132201",
+        "fqbn":    "arduino:avr:uno",
+        "github":  f"{GITHUB_RAW}/linear2.cpp",
+    },
 ]
 
 
