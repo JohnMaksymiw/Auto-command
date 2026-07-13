@@ -50,33 +50,28 @@ void setup() {
   digitalWrite(M1_RELAY, LOW);
   digitalWrite(M2_RELAY, LOW);
 
-  Serial.println(F("linear2 ready. Commands: raise, stop"));
+  Serial.println(F("linear2 ready. Commands: raise, lower, stop"));
+}
+
+void startMove(bool raising) {
+  if (running) { Serial.println(F("Already running")); return; }
+  digitalWrite(M1_DIR, raising ? LOW  : HIGH);
+  digitalWrite(M2_DIR, raising ? HIGH : LOW);
+  digitalWrite(M1_RELAY, HIGH);
+  digitalWrite(M2_RELAY, HIGH);
+  stepsLeft = RAISE_STEPS;
+  lastStep  = micros();
+  running   = true;
+  Serial.print(raising ? F("Raising: ") : F("Lowering: "));
+  Serial.print(RAISE_STEPS);
+  Serial.println(F(" steps each motor"));
 }
 
 void handleCommand(const char *cmd) {
-  if (strcmp(cmd, "raise") == 0) {
-    if (running) {
-      Serial.println(F("Already running"));
-      return;
-    }
-    // M1 forward, M2 reverse (opposite directions)
-    digitalWrite(M1_DIR, LOW);
-    digitalWrite(M2_DIR, HIGH);
-    digitalWrite(M1_RELAY, HIGH);
-    digitalWrite(M2_RELAY, HIGH);
-    stepsLeft = RAISE_STEPS;
-    lastStep  = micros();
-    running   = true;
-    Serial.print(F("Raising: "));
-    Serial.print(RAISE_STEPS);
-    Serial.println(F(" steps each motor"));
-  }
-  else if (strcmp(cmd, "stop") == 0) {
-    stopMotors();
-  }
-  else {
-    Serial.println(F("Unknown cmd. Use: raise, stop"));
-  }
+  if      (strcmp(cmd, "raise") == 0) startMove(true);
+  else if (strcmp(cmd, "lower") == 0) startMove(false);
+  else if (strcmp(cmd, "stop")  == 0) stopMotors();
+  else Serial.println(F("Unknown cmd. Use: raise, lower, stop"));
 }
 
 void loop() {
