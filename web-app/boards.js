@@ -74,7 +74,7 @@ window.BOARDS = [
         commands: [
           { cmd: 'home',     label: 'Home' },
           { cmd: 'mix',      label: 'Move to Mix Position' },
-          { cmd: 'dispense', label: 'Dispense' },
+          { cmd: 'dispense', label: 'Dispense' }
         ]
       },
       {
@@ -102,41 +102,6 @@ window.BOARDS = [
   },
 
   {
-    id: 'linear2',
-    name: 'Linear 2',
-    baud: 115200,
-    groups: [
-      {
-        title: 'Motor 1',
-        commands: [
-          { cmd: 'm1on',  label: 'Motor 1 On',  accent: true },
-          { cmd: 'm1off', label: 'Motor 1 Off', danger: true }
-        ]
-      },
-      {
-        title: 'Motor 2',
-        commands: [
-          { cmd: 'm2on',  label: 'Motor 2 On',  accent: true },
-          { cmd: 'm2off', label: 'Motor 2 Off', danger: true }
-        ]
-      },
-      {
-        title: 'Both',
-        commands: [
-          { cmd: 'allon',  label: 'All On',  accent: true },
-          { cmd: 'alloff', label: 'All Off', danger: true }
-        ]
-      },
-      {
-        title: 'Information',
-        commands: [
-          { cmd: 'status', label: 'Status' }
-        ]
-      }
-    ]
-  },
-
-  {
     id: 'linear',
     name: 'Linear',
     baud: 115200,
@@ -154,7 +119,7 @@ window.BOARDS = [
           { cmd: 'home',         label: 'Home' },
           { cmd: 'mix',          label: 'Move to Mix Position' },
           { cmd: 'start',        label: 'Start Dispensing' },
-          { cmd: 'stopdispense', label: 'Stop Dispensing' },
+          { cmd: 'stopdispense', label: 'Stop Dispensing' }
         ]
       },
       {
@@ -204,6 +169,21 @@ window.BOARDS = [
           { cmd: 'hallstream', label: 'Hall Stream On' },
           { cmd: 'halloff',    label: 'Hall Stream Off' },
           { cmd: 'status',     label: 'Status' }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'linear2',
+    name: 'Linear 2',
+    baud: 115200,
+    groups: [
+      {
+        title: 'Commands',
+        commands: [
+          { cmd: 'raise', label: 'Raise' },
+          { cmd: 'stop',  label: 'Stop' }
         ]
       }
     ]
