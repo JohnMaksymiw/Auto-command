@@ -103,7 +103,7 @@ window.BOARDS = [
 
   {
     id: 'linear',
-    name: 'Linear',
+    name: 'Conveyor',
     baud: 115200,
     groups: [
       {
@@ -176,7 +176,7 @@ window.BOARDS = [
 
   {
     id: 'linear2',
-    name: 'Linear 2',
+    name: 'Overflow',
     baud: 115200,
     groups: [
       {
