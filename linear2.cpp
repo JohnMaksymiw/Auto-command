@@ -3,7 +3,7 @@
 // Motor 1: STEP=2  DIR=3  RELAY=5
 // Motor 2: STEP=6  DIR=7  RELAY=4
 //
-// Relay modules are active-LOW (LOW = energised/on, HIGH = off).
+// Relay modules are active-HIGH (HIGH = energised/on, LOW = off).
 //
 // Commands:
 //   m1on   — relay on, motor 1 runs
@@ -34,14 +34,14 @@ unsigned long m2LastStep = 0;
 // ---- helpers ----
 
 void motorOn(int relayPin, bool &running, unsigned long &lastStep) {
-  digitalWrite(relayPin, LOW);   // energise relay
+  digitalWrite(relayPin, HIGH);  // energise relay
   running  = true;
   lastStep = micros();
 }
 
 void motorOff(int relayPin, bool &running) {
   running = false;
-  digitalWrite(relayPin, HIGH);  // de-energise relay
+  digitalWrite(relayPin, LOW);   // de-energise relay
 }
 
 // ---- setup ----
@@ -57,8 +57,8 @@ void setup() {
   pinMode(M2_RELAY, OUTPUT);
 
   // Relays off at startup
-  digitalWrite(M1_RELAY, HIGH);
-  digitalWrite(M2_RELAY, HIGH);
+  digitalWrite(M1_RELAY, LOW);
+  digitalWrite(M2_RELAY, LOW);
 
   // Direction (fixed for now)
   digitalWrite(M1_DIR, LOW);
