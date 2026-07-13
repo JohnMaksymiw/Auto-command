@@ -14,12 +14,12 @@
 //   alloff — both motors off
 //   status — print current state
 
-const int M1_STEP  = 2;
-const int M1_DIR   = 3;
+const int M1_STEP  = 3;
+const int M1_DIR   = 2;
 const int M1_RELAY = 5;
 
-const int M2_STEP  = 6;
-const int M2_DIR   = 7;
+const int M2_STEP  = 7;
+const int M2_DIR   = 6;
 const int M2_RELAY = 4;
 
 const unsigned long INTERVAL_US = 1000;  // µs between steps (~1000 steps/sec)
