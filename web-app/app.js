@@ -520,8 +520,8 @@ function showBoard(id) {
 const PORT_HINTS = {
   mixer:   'usbmodem13301',
   bowl:    'usbmodem11101',
-  linear2: 'usbmodem132201',
-  linear:  'usbmodem13401'
+  linear:  'usbmodem13401',
+  linear2: 'usbmodem132201'
 };
 
 let homeStatusEl = null;
