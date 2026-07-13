@@ -1,18 +1,14 @@
-// linear2.cpp — Two NEMA 17 stepper motors with relay control
+// linear2.cpp — Two NEMA 17 steppers via TB6600, relay-switched power
 //
-// Motor 1: STEP=2  DIR=3  RELAY=5
-// Motor 2: STEP=6  DIR=7  RELAY=4
+// Motor 1: STEP=3  DIR=2  RELAY=5
+// Motor 2: STEP=7  DIR=6  RELAY=4
 //
-// Relay modules are active-HIGH (HIGH = energised/on, LOW = off).
+// TB6600 at 1/32 microstep → 6400 steps/rev (NEMA 17, 200 base steps × 32)
+// Relays are active-HIGH (HIGH = energised/on, LOW = off)
 //
 // Commands:
-//   m1on   — relay on, motor 1 runs
-//   m1off  — motor 1 stops, relay off
-//   m2on   — relay on, motor 2 runs
-//   m2off  — motor 2 stops, relay off
-//   allon  — both motors on
-//   alloff — both motors off
-//   status — print current state
+//   raise — both motors run 10 rotations in opposite directions
+//   stop  — stop immediately
 
 const int M1_STEP  = 3;
 const int M1_DIR   = 2;
@@ -22,29 +18,23 @@ const int M2_STEP  = 7;
 const int M2_DIR   = 6;
 const int M2_RELAY = 4;
 
-const unsigned long INTERVAL_US = 1000;  // µs between steps (~1000 steps/sec)
-const unsigned int  PULSE_US    = 10;    // step pulse width µs
+const unsigned long INTERVAL_US   = 500;    // µs between steps (~2000 steps/sec)
+const unsigned int  PULSE_US      = 10;     // step pulse width µs
+const long          STEPS_PER_REV = 6400;   // TB6600 1/32 microstep, NEMA 17
+const int           RAISE_REVS    = 10;
+const long          RAISE_STEPS   = (long)RAISE_REVS * STEPS_PER_REV; // 64000
 
-bool m1Running = false;
-bool m2Running = false;
+bool running   = false;
+long stepsLeft = 0;
+unsigned long lastStep = 0;
 
-unsigned long m1LastStep = 0;
-unsigned long m2LastStep = 0;
-
-// ---- helpers ----
-
-void motorOn(int relayPin, bool &running, unsigned long &lastStep) {
-  digitalWrite(relayPin, HIGH);  // energise relay
-  running  = true;
-  lastStep = micros();
+void stopMotors() {
+  running    = false;
+  stepsLeft  = 0;
+  digitalWrite(M1_RELAY, LOW);
+  digitalWrite(M2_RELAY, LOW);
+  Serial.println(F("Stopped"));
 }
-
-void motorOff(int relayPin, bool &running) {
-  running = false;
-  digitalWrite(relayPin, LOW);   // de-energise relay
-}
-
-// ---- setup ----
 
 void setup() {
   Serial.begin(115200);
@@ -60,84 +50,59 @@ void setup() {
   digitalWrite(M1_RELAY, LOW);
   digitalWrite(M2_RELAY, LOW);
 
-  // Direction (fixed for now)
-  digitalWrite(M1_DIR, LOW);
-  digitalWrite(M2_DIR, LOW);
-
-  Serial.println(F("linear2 ready. Commands: m1on m1off m2on m2off allon alloff status"));
+  Serial.println(F("linear2 ready. Commands: raise, stop"));
 }
-
-// ---- command handler ----
 
 void handleCommand(const char *cmd) {
-  if (strcmp(cmd, "m1on") == 0) {
-    motorOn(M1_RELAY, m1Running, m1LastStep);
-    Serial.println(F("Motor 1 ON"));
+  if (strcmp(cmd, "raise") == 0) {
+    if (running) {
+      Serial.println(F("Already running"));
+      return;
+    }
+    // M1 forward, M2 reverse (opposite directions)
+    digitalWrite(M1_DIR, LOW);
+    digitalWrite(M2_DIR, HIGH);
+    digitalWrite(M1_RELAY, HIGH);
+    digitalWrite(M2_RELAY, HIGH);
+    stepsLeft = RAISE_STEPS;
+    lastStep  = micros();
+    running   = true;
+    Serial.print(F("Raising: "));
+    Serial.print(RAISE_STEPS);
+    Serial.println(F(" steps each motor"));
   }
-  else if (strcmp(cmd, "m1off") == 0) {
-    motorOff(M1_RELAY, m1Running);
-    Serial.println(F("Motor 1 OFF"));
-  }
-  else if (strcmp(cmd, "m2on") == 0) {
-    motorOn(M2_RELAY, m2Running, m2LastStep);
-    Serial.println(F("Motor 2 ON"));
-  }
-  else if (strcmp(cmd, "m2off") == 0) {
-    motorOff(M2_RELAY, m2Running);
-    Serial.println(F("Motor 2 OFF"));
-  }
-  else if (strcmp(cmd, "allon") == 0) {
-    motorOn(M1_RELAY, m1Running, m1LastStep);
-    motorOn(M2_RELAY, m2Running, m2LastStep);
-    Serial.println(F("Both motors ON"));
-  }
-  else if (strcmp(cmd, "alloff") == 0) {
-    motorOff(M1_RELAY, m1Running);
-    motorOff(M2_RELAY, m2Running);
-    Serial.println(F("Both motors OFF"));
-  }
-  else if (strcmp(cmd, "status") == 0) {
-    Serial.print(F("Motor 1: ")); Serial.println(m1Running ? F("ON") : F("OFF"));
-    Serial.print(F("Motor 2: ")); Serial.println(m2Running ? F("ON") : F("OFF"));
+  else if (strcmp(cmd, "stop") == 0) {
+    stopMotors();
   }
   else {
-    Serial.println(F("Unknown cmd. Use: m1on m1off m2on m2off allon alloff status"));
+    Serial.println(F("Unknown cmd. Use: raise, stop"));
   }
 }
-
-// ---- loop ----
 
 void loop() {
   // Serial command reader
-  static char buf[32];
+  static char    buf[32];
   static uint8_t pos = 0;
   while (Serial.available()) {
     char c = Serial.read();
     if (c == '\n' || c == '\r') {
-      if (pos > 0) {
-        buf[pos] = '\0';
-        handleCommand(buf);
-        pos = 0;
-      }
+      if (pos > 0) { buf[pos] = '\0'; handleCommand(buf); pos = 0; }
     } else if (pos < sizeof(buf) - 1) {
       buf[pos++] = c;
     }
   }
 
   // Non-blocking stepping
-  unsigned long now = micros();
-
-  if (m1Running && (now - m1LastStep >= INTERVAL_US)) {
-    m1LastStep = now;
-    digitalWrite(M1_STEP, HIGH);
-    delayMicroseconds(PULSE_US);
-    digitalWrite(M1_STEP, LOW);
-  }
-
-  if (m2Running && (now - m2LastStep >= INTERVAL_US)) {
-    m2LastStep = now;
-    digitalWrite(M2_STEP, HIGH);
-    delayMicroseconds(PULSE_US);
-    digitalWrite(M2_STEP, LOW);
+  if (running && stepsLeft > 0) {
+    unsigned long now = micros();
+    if (now - lastStep >= INTERVAL_US) {
+      lastStep = now;
+      digitalWrite(M1_STEP, HIGH);
+      digitalWrite(M2_STEP, HIGH);
+      delayMicroseconds(PULSE_US);
+      digitalWrite(M1_STEP, LOW);
+      digitalWrite(M2_STEP, LOW);
+      if (--stepsLeft == 0) stopMotors();
+    }
   }
 }
