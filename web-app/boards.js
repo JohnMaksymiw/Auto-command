@@ -183,6 +183,7 @@ window.BOARDS = [
         title: 'Commands',
         commands: [
           { cmd: 'raise', label: 'Raise' },
+          { cmd: 'lower', label: 'Lower' },
           { cmd: 'stop',  label: 'Stop' }
         ]
       }
