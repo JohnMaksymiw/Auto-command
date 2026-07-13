@@ -518,9 +518,10 @@ function showBoard(id) {
 
 // Hardcoded port hints shown to the user during sequential picking
 const PORT_HINTS = {
-  mixer: 'usbmodem13301',
-  bowl:  'usbmodem11101',
-  linear:'usbmodem13401'
+  mixer:   'usbmodem13301',
+  bowl:    'usbmodem11101',
+  linear2: 'usbmodem132201',
+  linear:  'usbmodem13401'
 };
 
 let homeStatusEl = null;
