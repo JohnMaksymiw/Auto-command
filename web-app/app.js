@@ -591,6 +591,8 @@ async function disconnectAll() {
 
 async function connectAll(btn) {
   btn.disabled = true;
+  // Clear stale saved port info so this Connect All writes a completely fresh mapping
+  localStorage.removeItem('boardPortInfo');
   for (const board of window.BOARDS) {
     const st = boardState[board.id];
     if (st && st.connected) {
