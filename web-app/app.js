@@ -749,18 +749,7 @@ function init() {
 
   showBoard('home');
 
-  // Auto-connect on load if ports were previously granted
-  homeStatusEl.textContent = 'Connecting…';
-  tryAutoConnect().then(anyConnected => {
-    const allConnected = window.BOARDS.every(b => boardState[b.id] && boardState[b.id].connected);
-    if (allConnected) {
-      homeStatusEl.textContent = 'All boards auto-connected';
-    } else if (anyConnected) {
-      homeStatusEl.textContent = 'Some boards auto-connected — click Connect to add remaining';
-    } else {
-      homeStatusEl.textContent = '';
-    }
-  });
+  homeStatusEl.textContent = '';
 
   // Camera button in topbar
   document.getElementById('cam-toggle-btn').addEventListener('click', openCamera);
