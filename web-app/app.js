@@ -593,6 +593,7 @@ async function connectAll(btn) {
   btn.disabled = true;
   // Clear stale saved port info so this Connect All writes a completely fresh mapping
   localStorage.removeItem('boardPortInfo');
+  localStorage.removeItem('boardConfigVersion');
   for (const board of window.BOARDS) {
     const st = boardState[board.id];
     if (st && st.connected) {
@@ -635,6 +636,8 @@ async function connectAll(btn) {
 
   const allConnected = window.BOARDS.every(b => boardState[b.id] && boardState[b.id].connected);
   homeStatusEl.textContent = allConnected ? 'All boards connected' : 'Done — check individual tabs for any skipped boards';
+  // Save board config version so auto-connect knows this mapping is valid
+  localStorage.setItem('boardConfigVersion', window.BOARDS.map(b => b.id).join(','));
   btn.disabled = false;
 }
 
@@ -654,6 +657,14 @@ async function savePortInfo(boardId, port) {
 async function tryAutoConnect() {
   const ports = await navigator.serial.getPorts();
   if (!ports.length) return false;
+
+  // If the saved board config doesn't match current boards, saved indices are stale — skip
+  const currentVersion = window.BOARDS.map(b => b.id).join(',');
+  if (localStorage.getItem('boardConfigVersion') !== currentVersion) {
+    localStorage.removeItem('boardPortInfo');
+    localStorage.removeItem('boardConfigVersion');
+    return false;
+  }
 
   const saved = JSON.parse(localStorage.getItem('boardPortInfo') || '{}');
   const claimed = new Set();
